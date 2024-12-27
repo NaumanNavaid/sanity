@@ -32,12 +32,6 @@ interface Post {
   }
 }
 
-interface PageProps {
-  params: {
-    slug: string
-  }
-}
-
 async function getPost(slug: string): Promise<Post | null> {
   try {
     return await client.fetch(`
@@ -67,7 +61,20 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-export default async function PostPage({ params }: PageProps) {
+// Using generateStaticParams for dynamic slugs
+export async function generateStaticParams() {
+  const posts = await client.fetch(`
+    *[_type == "post"] {
+      "slug": slug.current
+    }
+  `)
+
+  return posts.map((post: { slug: string }) => ({
+    slug: post.slug
+  }))
+}
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug)
 
   if (!post) {

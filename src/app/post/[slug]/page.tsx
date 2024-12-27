@@ -79,6 +79,7 @@ interface PostPageProps {
   }
 }
 
+// Fixing the type constraint issue
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost(params.slug)
 
@@ -117,4 +118,5 @@ export default async function PostPage({ params }: PostPageProps) {
     </article>
   )
 }
+
 

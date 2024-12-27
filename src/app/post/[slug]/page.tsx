@@ -1,8 +1,33 @@
-// app/posts/[slug]/page.tsx
 import { client } from '@/sanity/lib/client'
 import { PortableText } from '@portabletext/react'
 
-async function getPost(slug: string) {
+interface Post {
+  title: string
+  mainImage?: {
+    asset: {
+      url: string
+    }
+    alt?: string
+  }
+  publishedAt: string
+  body: any[]
+  author: {
+    name: string
+    image?: {
+      asset: {
+        url: string
+      }
+    }
+  }
+}
+
+interface PageProps {
+  params: {
+    slug: string
+  }
+}
+
+async function getPost(slug: string): Promise<Post | null> {
   return client.fetch(`
     *[_type == "post" && slug.current == $slug][0] {
       title,
@@ -26,7 +51,7 @@ async function getPost(slug: string) {
   `, { slug })
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+export default async function PostPage({ params }: PageProps) {
   const post = await getPost(params.slug)
 
   if (!post) {

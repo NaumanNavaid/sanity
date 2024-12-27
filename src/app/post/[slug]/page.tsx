@@ -1,7 +1,6 @@
 import { client } from '@/sanity/lib/client'
 import { PortableText } from '@portabletext/react'
 
-// Define the type for the PortableText body
 type PortableTextBlock = {
   _key: string
   _type: string
@@ -21,7 +20,7 @@ interface Post {
     alt?: string
   }
   publishedAt: string
-  body: PortableTextBlock[] // Adjusted the body type to be more specific
+  body: PortableTextBlock[]
   author: {
     name: string
     image?: {
@@ -74,7 +73,13 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+interface PostPageProps {
+  params: {
+    slug: string
+  }
+}
+
+export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost(params.slug)
 
   if (!post) {
@@ -112,3 +117,4 @@ export default async function PostPage({ params }: { params: { slug: string } })
     </article>
   )
 }
+

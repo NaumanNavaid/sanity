@@ -1,6 +1,17 @@
 import { client } from '@/sanity/lib/client'
 import { PortableText } from '@portabletext/react'
 
+// Define the type for the PortableText body
+type PortableTextBlock = {
+  _key: string
+  _type: string
+  children: Array<{
+    _key: string
+    _type: string
+    text: string
+  }>
+}
+
 interface Post {
   title: string
   mainImage?: {
@@ -10,7 +21,7 @@ interface Post {
     alt?: string
   }
   publishedAt: string
-  body: any[]
+  body: PortableTextBlock[] // Adjusted the body type to be more specific
   author: {
     name: string
     image?: {
@@ -28,27 +39,32 @@ interface PageProps {
 }
 
 async function getPost(slug: string): Promise<Post | null> {
-  return client.fetch(`
-    *[_type == "post" && slug.current == $slug][0] {
-      title,
-      mainImage {
-        asset-> {
-          url
-        },
-        alt
-      },
-      publishedAt,
-      body,
-      author-> {
-        name,
-        image {
+  try {
+    return await client.fetch(`
+      *[_type == "post" && slug.current == $slug][0] {
+        title,
+        mainImage {
           asset-> {
             url
+          },
+          alt
+        },
+        publishedAt,
+        body,
+        author-> {
+          name,
+          image {
+            asset-> {
+              url
+            }
           }
         }
       }
-    }
-  `, { slug })
+    `, { slug })
+  } catch (error) {
+    console.error('Error fetching post:', error)
+    return null
+  }
 }
 
 export default async function PostPage({ params }: PageProps) {
